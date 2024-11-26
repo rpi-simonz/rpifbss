@@ -13,12 +13,16 @@ Otherwise the current working directory is used.
 
 The slideshow can be controlled interactively with fbi's key shortcuts.
 
-  * 'h' lists them on the framebuffer display
-  * 'q' stops the slideshow, reads in possible new files and restarts the show
+  * 'h' lists all of them on the framebuffer display
+  * 'q' stops the slideshow, reads in possible new or modified files and restarts the show
 
 Ctrl-C ends this program.
 
 The configuration is done in the script *rpifbss* itself, in a 'Configuration section' at the beginning.
+
+To have a comfortable environment it is recommended to start *rpifbss* in a *tmux* or *screen* session.
+Then one always has access to the running slideshow, even remotely via an SSH connection.
+
 
 
 ## Requirements and preparations
@@ -99,7 +103,7 @@ In case the original old *fbi* is already/still installed it is recommended
 to uninstall it:
 
 ```
-sudo apt remove fbi
+sudo apt purge fbi
 ```
 
 Or at least we should clean up the current shell's cache by:
