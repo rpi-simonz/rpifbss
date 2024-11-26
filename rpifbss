@@ -9,15 +9,16 @@ function print_info() {
 
 rpifbss - Raspberry Pi Framebuffer Slideshow
 
-This program provides a simple slideshow from a directory of images.
+This program provides a simple slideshow from a directory of files.
 It uses the software 'fbi' for that.
+So only still images are possible, no videos.
 
 PDF files are displayed as well.
 Even short text files (with extension .txt) are converted to images and shown.
 
-The slideshow can be manipulated interactively with fbi's keystrokes.
-'h' lists them on the framebuffer display.
-'q' stops the slideshow, reads in possible new files and restarts the show.
+The slideshow can be manipulated interactively with fbi's key shortcuts.
+  'h' lists them on the framebuffer display
+  'q' stops the slideshow, reads in possible new files and restarts the show
 
 Ctrl-C ends this program.
 
