@@ -21,8 +21,7 @@ Ctrl-C ends this program.
 The configuration is done in the script *rpifbss* itself, in a 'Configuration section' at the beginning.
 
 To have a comfortable environment it is recommended to start *rpifbss* in a *tmux* or *screen* session.
-Then one always has access to the running slideshow, even remotely via an SSH connection.
-
+Then the running slideshow is always accessible, even remotely via an SSH connection.
 
 
 ## Requirements and preparations
