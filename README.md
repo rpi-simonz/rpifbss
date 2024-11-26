@@ -8,6 +8,9 @@ So only still images are possible, no videos.
 PDF files are displayed as well.
 Even short text files (with extension .txt) are converted to images and shown.
 
+The directory containing the files to be displayed can be defined by the first argument.
+Otherwise the current working directory is used.
+
 The slideshow can be controlled interactively with fbi's key shortcuts.
 
   * 'h' lists them on the framebuffer display
@@ -15,7 +18,7 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
 
 Ctrl-C ends this program.
 
-The configuration is done in the script *rpifbss* itself.
+The configuration is done in the script *rpifbss* itself, in a 'Configuration section' at the beginning.
 
 
 ## Requirements and preparations
