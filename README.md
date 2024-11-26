@@ -1,6 +1,6 @@
 # rpifbss - Raspberry Pi Framebuffer Slideshow
 
-This program provides a simple slideshow from a directory of files.
+This program provides a simple framebuffer slideshow from a directory of files.
 
 It uses the software 'fbi' for that.
 So only still images are possible, no videos.
@@ -14,6 +14,8 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
   * 'q' stops the slideshow, reads in possible new files and restarts the show
 
 Ctrl-C ends this program.
+
+The configuration is done in the script *rpifbss* itself.
 
 
 ## Requirements and preparations
@@ -68,21 +70,23 @@ Edit it with
 nano Makefile
 ```
 
-and add these two lines (important: That's a leading TAB in the second line!):
+and add these two lines at the bottom (important: That's a leading TAB in the second line!):
 
 ```
 install:
-        $(MESON) install -C $(BDIR)
+	$(MESON) install -C $(BDIR)
 ```
 
 Following the fbida documentation won't work on standard Raspberry Pi OS
 because the user *root* isn't usable there by default.
 
+Instead of
+
 ```
 su -c "make install"
 ```
 
-So better use this:
+better use this:
 
 ```
 sudo make install
