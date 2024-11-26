@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+#
+# Some notes - to be improved!
+#
+# Adapt ImageMagick!
+#     sudo vi /etc/ImageMagick-6/policy.xml
+#         <!--  <policy domain="path" rights="none" pattern="@*"/>  -->
+#         <!--  <policy domain="coder" rights="none" pattern="PDF" />  -->
+#
+#     identify -list resource
+#
+# Start system without graphical desktop
+#     temporary:
+#         sudo systemctl isolate multi-user
+#     permanent:
+#         sudo systemctl set-default multi-user
+#
+# Manual compile fbi 2.14
+#
+# Stop blinking framebuffer cursor
+#     sudo -s
+#     echo 0 > /sys/class/graphics/fbcon/cursor_blink
+#     exit
+
+
+function print_info() {
+    cat <<EOF
+==============================================================================
+
+rpifbss - Raspberry Pi Framebuffer Slideshow
+
+This program provides a simple slideshow from a directory of images.
+It uses the software 'fbi' for that.
+
+PDF files are displayed as well.
+Even short text files (with extension .txt) are converted to images and shown.
+
+The slideshow can be manipulated interactively with fbi's keystrokes.
+'h' lists them on the framebuffer display.
+'q' stops the slideshow, reads in possible new files and restarts the show.
+
+Ctrl-C ends this program.
+
+==============================================================================
+EOF
+}
+
+
+trap exit INT
+
+MYNAME=$(basename $0)
+
+SECONDS_PER_IMAGE=3
+BLEND_MILLISECONDS=800
+
+IMAGE_DIR=~/dia
+MAINTENANCE_DIR=${IMAGE_DIR}/maintenance
+
+MAINTENANCE_MSG_FILE=${MAINTENANCE_DIR}/maintenance.txt
+MAINTENANCE_MSG_DEFAULT="*** Maintenance running. Please be patient. ***"
+
+
+function txtfiles2jpg() {
+    # convert text files from current directory to jpg images
+
+    typ="$1"
+    OPTS=""
+    case $typ in
+        red)     OPTS="-background red" ;;
+        yellow)  OPTS="-background yellow" ;;
+    esac
+
+    for f in *.txt ; do
+        img="${f}.jpg"
+        if [ ! "$f" -nt "$img" ] ; then
+            echo "'$img' already existing and up-to-date"
+            continue
+        fi
+        echo "Converting '$f' to jpg."
+        convert $OPTS -size 400x caption:@- "${img}" < "$f"
+    done
+}
+
+
+function prepare_maintenance_dir() {
+    # optionally create maintenance directory and default maintenance files
+
+    mkdir -p $MAINTENANCE_DIR
+
+    [ -f $MAINTENANCE_MSG_FILE ] || echo "$MAINTENANCE_MSG_DEFAULT" > $MAINTENANCE_MSG_FILE
+    pushd $MAINTENANCE_DIR
+    txtfiles2jpg red
+    popd
+}
+
+
+function maintenance() {
+    # check for files not yet converted to jpg and convert them
+    # display an appropriate message during the conversion
+
+    echo "----------------------------------------------"
+    fbi -d /dev/fb0 --nointeractive --noverbose -a ${MAINTENANCE_MSG_FILE}.jpg < /dev/null &
+    fbipid=$!
+    txtfiles2jpg
+    kill $fbipid
+    echo "----------------------------------------------"
+}
+
+#=============================================================================
+
+print_info
+
+cd $IMAGE_DIR || exit 1
+
+prepare_maintenance_dir
+
+while true ; do
+    maintenance
+    fbi -d /dev/fb0 --noverbose -a --blend $BLEND_MILLISECONDS -t $SECONDS_PER_IMAGE $(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.sh" -o -name "$MYNAME" \) -print | sort) 
+done
+
