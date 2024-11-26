@@ -16,6 +16,11 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
   * 'h' lists all of them on the framebuffer display
   * 'q' stops the slideshow, reads in possible new or modified files and restarts the show
 
+During re-reading and possibly converting new files, what can need several seconds,
+there is a maintenance message displayed. 
+This message is stored in a text file in the automatically created subdirectory 'maintenance/'
+and can be adapted to individual needs.
+
 Ctrl-C ends this program.
 
 The configuration is done in the script *rpifbss* itself, in a 'Configuration section' at the beginning.
