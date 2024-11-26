@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 #
+# rpifbss - Raspberry Pi Framebuffer Slideshow    by rpi-simonz Nov. 2024
+#
 # Some notes - to be improved!
 #
 # Adapt ImageMagick!
@@ -62,12 +64,13 @@ MAINTENANCE_MSG_DEFAULT="*** Maintenance running. Please be patient. ***"
 
 function txtfiles2jpg() {
     # convert text files from current directory to jpg images
+    # the image background (and more) can be configured and choosen by an optional argument
 
     typ="$1"
     OPTS=""
     case $typ in
-        red)     OPTS="-background red" ;;
-        yellow)  OPTS="-background yellow" ;;
+        error|red)       OPTS="-background red" ;;
+        warning|yellow)  OPTS="-background yellow" ;;
     esac
 
     for f in *.txt ; do
@@ -116,6 +119,7 @@ prepare_maintenance_dir
 
 while true ; do
     maintenance
-    fbi -d /dev/fb0 --noverbose -a --blend $BLEND_MILLISECONDS -t $SECONDS_PER_IMAGE $(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.sh" -o -name "$MYNAME" \) -print | sort) 
+    IMAGES=$(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "$MYNAME" \) -print | sort)
+    fbi -d /dev/fb0 --noverbose -a --blend $BLEND_MILLISECONDS -t $SECONDS_PER_IMAGE  $IMAGES 
 done
 
