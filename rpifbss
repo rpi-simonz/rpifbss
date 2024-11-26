@@ -1,28 +1,6 @@
 #!/usr/bin/env bash
 #
 # rpifbss - Raspberry Pi Framebuffer Slideshow    by rpi-simonz Nov. 2024
-#
-# Some notes - to be improved!
-#
-# Adapt ImageMagick!
-#     sudo vi /etc/ImageMagick-6/policy.xml
-#         <!--  <policy domain="path" rights="none" pattern="@*"/>  -->
-#         <!--  <policy domain="coder" rights="none" pattern="PDF" />  -->
-#
-#     identify -list resource
-#
-# Start system without graphical desktop
-#     temporary:
-#         sudo systemctl isolate multi-user
-#     permanent:
-#         sudo systemctl set-default multi-user
-#
-# Manual compile fbi 2.14
-#
-# Stop blinking framebuffer cursor
-#     sudo -s
-#     echo 0 > /sys/class/graphics/fbcon/cursor_blink
-#     exit
 
 
 function print_info() {
