@@ -32,6 +32,9 @@ if [ ! -d "$IMAGE_DIR" ] ; then
     exit 1
 fi
 
+cd $IMAGE_DIR || exit 1
+IMAGE_DIR=${PWD}
+
 
 # >>>> Configuration section
 
@@ -100,8 +103,6 @@ function maintenance() {
 #=============================================================================
 
 print_info
-
-cd $IMAGE_DIR || exit 1
 
 prepare_maintenance_dir
 
