@@ -25,6 +25,9 @@ It uses software 'fbi' for that. So only still images are possible, no videos.
 PDF files are displayed as well.
 Even short text files (with extension .txt) are converted to images and shown.
 
+The directory containing the files to be displayed can be defined by the first
+commandline argument. Otherwise the current working directory is used.
+
 The slideshow can be controlled interactively with fbi's key shortcuts.
 
   'h' lists them on the framebuffer display, see below
@@ -121,7 +124,17 @@ function maintenance() {
     echo "----------------------------------------------"
 }
 
+
+function list_images() {
+    find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" \) -print | sort
+}
+
 #=============================================================================
+
+if [ "$1" == "-h" ] ; then
+    print_info
+    exit
+fi
 
 IMAGE_DIR=${1:-$PWD}
 if [ ! -d "$IMAGE_DIR" ] ; then
@@ -149,9 +162,13 @@ print_info
 prepare_maintenance_dir
 trap exit INT
 
+echo -e "\nThe following images/files will be displayed in this (alphabetical) order:\n"
+list_images
+echo ""
+
 while true ; do
     maintenance
-    IMAGES=$(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" \) -print | sort)
+    IMAGES=$(list_images)
     fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
 done
 
