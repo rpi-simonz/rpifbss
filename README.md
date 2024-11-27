@@ -40,7 +40,7 @@ keyboard commands
 
 available if started with --edit switch,
 rotation works for jpeg images only:
-  D, Shift+d     - delete image
+  D, Shift+d     - delete image       *** really, without confirmation dialog! ***
   r              - rotate 90 degrees clockwise
   l              - rotate 90 degrees counter-clockwise
   x              - mirror image vertically (top / bottom)

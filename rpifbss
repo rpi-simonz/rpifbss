@@ -55,7 +55,7 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
 
   available if started with --edit switch,
   rotation works for jpeg images only:
-    D, Shift+d     - delete image
+    D, Shift+d     - delete image       *** really, without confirmation dialog! ***
     r              - rotate 90 degrees clockwise
     l              - rotate 90 degrees counter-clockwise
     x              - mirror image vertically (top / bottom)
@@ -137,13 +137,21 @@ MAINTENANCE_MSG_FILE=${MAINTENANCE_DIR}/maintenance.txt
 
 MYNAME=$(basename $0)
 
+MYVERSION=$(fbi -V | head -1 | awk '{sub(/,/,"",$3); print $3;}')
+if [[ "$MYVERSION" < "2.14" ]] ; then
+    echo -e "\nError: Program 'fbi' is too old! Please update to version 2.14 or newer!"
+    echo -e "       Probably it needs to be compiled from source."
+    echo -e "       See README.md for details.\n"
+    exit 3
+fi
+
 print_info
 prepare_maintenance_dir
 trap exit INT
 
 while true ; do
     maintenance
-    IMAGES=$(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "$MYNAME" \) -print | sort)
-    fbi --device /dev/fb0 --noverbose --edit --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
+    IMAGES=$(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" \) -print | sort)
+    fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
 done
 
