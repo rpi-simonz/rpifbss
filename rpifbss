@@ -17,19 +17,57 @@ function print_info() {
 ===============================================================================
 
 rpifbss - Raspberry Pi Framebuffer Slideshow
+--------------------------------------------
 
 This program provides a simple framebuffer slideshow from a directory of files.
-It uses the software 'fbi' for that.
-So only still images are possible, no videos.
+It uses software 'fbi' for that. So only still images are possible, no videos.
 
 PDF files are displayed as well.
 Even short text files (with extension .txt) are converted to images and shown.
 
-The slideshow can be manipulated interactively with fbi's key shortcuts.
-  'h' lists them on the framebuffer display
-  'q' stops the slideshow, reads in possible new files and restarts the show
+The slideshow can be controlled interactively with fbi's key shortcuts.
 
-Ctrl-C ends this program.
+  'h' lists them on the framebuffer display, see below
+
+  'q' stops the current slideshow, and then
+
+      * reads in possible new or modified files
+      * converts unseen text files and
+      * restarts the slideshow with the new contents
+
+
+  keyboard commands
+  ~~~~~~~~~~~~~~~~~
+    cursor keys    - scroll image
+    PgUp, k        - previous image
+    PgDn, SPACE, j - next image
+    <i>g           - jump to image #i
+
+    a              - autozoom image
+    +/-            - zoom in/out
+    <i>s           - set zoom to <i>%
+
+    ESC, q         - quit
+    v              - toggle statusline
+    h              - show this help text
+    i              - show EXIF info
+    p              - pause slideshow
+
+  available if started with --edit switch,
+  rotation works for jpeg images only:
+    D, Shift+d     - delete image
+    r              - rotate 90 degrees clockwise
+    l              - rotate 90 degrees counter-clockwise
+    x              - mirror image vertically (top / bottom)
+    y              - mirror image horizontally (left to right)
+
+
+
+Ctrl-C ends this program and therfore the slideshow completely.
+
+To have a comfortable environment it is recommended to start this program
+in a 'tmux' or 'screen' session. Then the running slideshow is always
+accessible, even remotely via an SSH connection.
 
 ===============================================================================
 EOF
@@ -106,6 +144,6 @@ trap exit INT
 while true ; do
     maintenance
     IMAGES=$(find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "$MYNAME" \) -print | sort)
-    fbi -d /dev/fb0 --noverbose -a --blend $BLEND_MILLISECONDS -t $SECONDS_PER_IMAGE  $IMAGES
+    fbi --device /dev/fb0 --noverbose --edit --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
 done
 

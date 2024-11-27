@@ -52,7 +52,7 @@ there is a maintenance message displayed.
 This message is stored in a text file in the automatically created subdirectory 'maintenance/'
 and can be adapted to individual needs.
 
-Ctrl-C ends this program.
+Ctrl-C ends this program and therfore the slideshow completely.
 
 The configuration is done in the script *rpifbss* itself, in a 'Configuration section' at the beginning.
 
