@@ -28,9 +28,13 @@ Even short text files (with extension .txt) are converted to images and shown.
 The directory containing the files to be displayed can be defined by the first
 commandline argument. Otherwise the current working directory is used.
 
+To have a comfortable environment it is recommended to start this program
+in a 'tmux' or 'screen' session. Then the running slideshow is always
+accessible, even remotely via an SSH connection.
+
 The slideshow can be controlled interactively with fbi's key shortcuts.
 
-  'h' lists them on the framebuffer display, see below
+  'h' lists them on the framebuffer display
 
   'q' stops the current slideshow, and then
 
@@ -38,7 +42,13 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
       * converts unseen text files and
       * restarts the slideshow with the new contents
 
+===============================================================================
+EOF
+}
 
+
+function print_shortcuts() {
+    cat <<EOF
   keyboard commands
   ~~~~~~~~~~~~~~~~~
     cursor keys    - scroll image
@@ -50,7 +60,7 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
     +/-            - zoom in/out
     <i>s           - set zoom to <i>%
 
-    ESC, q         - quit
+    ESC, q         - quit         *** and restart with possibe new contents ***
     v              - toggle statusline
     h              - show this help text
     i              - show EXIF info
@@ -58,21 +68,14 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
 
   available if started with --edit switch,
   rotation works for jpeg images only:
-    D, Shift+d     - delete image       *** really, without confirmation dialog! ***
+    D, Shift+d     - delete image  *** really, without confirmation dialog! ***
     r              - rotate 90 degrees clockwise
     l              - rotate 90 degrees counter-clockwise
     x              - mirror image vertically (top / bottom)
     y              - mirror image horizontally (left to right)
 
 
-
 Ctrl-C ends this program and therfore the slideshow completely.
-
-To have a comfortable environment it is recommended to start this program
-in a 'tmux' or 'screen' session. Then the running slideshow is always
-accessible, even remotely via an SSH connection.
-
-===============================================================================
 EOF
 }
 
@@ -116,8 +119,9 @@ function maintenance() {
     # check for files not yet converted to jpg and convert them
     # display an appropriate message during the conversion
 
-    echo "----------------------------------------------"
-    fbi -d /dev/fb0 --nointeractive --noverbose -a ${MAINTENANCE_MSG_FILE}.jpg < /dev/null &
+    echo ""
+    echo "----- Maintenance running. Be patient. -------"
+    fbi -d /dev/fb0 --nointeractive --noverbose -a ${MAINTENANCE_MSG_FILE}.jpg </dev/null 2>$SAVE_STDERR_TO &
     fbipid=$!
     txtfiles2jpg
     kill $fbipid
@@ -126,13 +130,14 @@ function maintenance() {
 
 
 function list_images() {
-    find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" \) -print | sort
+    find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" -o -name "stderr.log" \) -print | sort
 }
 
 #=============================================================================
 
 if [ "$1" == "-h" ] ; then
     print_info
+    print_shortcuts
     exit
 fi
 
@@ -147,6 +152,9 @@ IMAGE_DIR=${PWD}
 
 MAINTENANCE_DIR=${IMAGE_DIR}/maintenance
 MAINTENANCE_MSG_FILE=${MAINTENANCE_DIR}/maintenance.txt
+
+SAVE_STDERR_TO="/dev/null"
+#SAVE_STDERR_TO="stderr.log"
 
 MYNAME=$(basename $0)
 
@@ -169,6 +177,8 @@ echo ""
 while true ; do
     maintenance
     IMAGES=$(list_images)
-    fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
+    echo ""
+    print_shortcuts
+    fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES  2>$SAVE_STDERR_TO
 done
 
