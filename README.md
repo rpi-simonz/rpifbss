@@ -8,16 +8,47 @@ So only still images are possible, no videos.
 PDF files are displayed as well.
 Even short text files (with extension .txt) are converted to images and shown.
 
-The directory containing the files to be displayed can be defined by the first argument.
-Otherwise the current working directory is used.
+The directory containing the files to be displayed can be defined by the first
+commandline argument. Otherwise the current working directory is used.
 
 The slideshow can be controlled interactively with fbi's key shortcuts.
 
-  * 'h' lists all of them on the framebuffer display
-  * 'q' stops the slideshow, reads in possible new or modified files and restarts the show
+  * 'h' lists all of them on the framebuffer display, see below
+  * 'q' stops the current slideshow, and then
+
+    * reads in possible new or modified files
+    * converts unseen text files
+    * and restarts the slideshow with the new contents
+
+```
+keyboard commands
+~~~~~~~~~~~~~~~~~
+  cursor keys    - scroll image
+  PgUp, k        - previous image
+  PgDn, SPACE, j - next image
+  <i>g           - jump to image #i
+
+  a              - autozoom image
+  +/-            - zoom in/out
+  <i>s           - set zoom to <i>%
+
+  ESC, q         - quit
+  v              - toggle statusline
+  h              - show this help text
+  i              - show EXIF info
+  p              - pause slideshow
+
+available if started with --edit switch,
+rotation works for jpeg images only:
+  D, Shift+d     - delete image
+  r              - rotate 90 degrees clockwise
+  l              - rotate 90 degrees counter-clockwise
+  x              - mirror image vertically (top / bottom)
+  y              - mirror image horizontally (left to right)
+```
 
 During re-reading and possibly converting new files, what can need several seconds,
-there is a maintenance message displayed. 
+there is a maintenance message displayed.
 This message is stored in a text file in the automatically created subdirectory 'maintenance/'
 and can be adapted to individual needs.
 
