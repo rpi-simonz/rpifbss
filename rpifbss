@@ -3,6 +3,7 @@
 # rpifbss - Raspberry Pi Framebuffer Slideshow    by rpi-simonz Nov. 2024
 
 # >>>> Configuration section
+#      Values might be overwritten by contents of an optional local file .rpifbss.conf
 
 SECONDS_PER_IMAGE=3
 BLEND_MILLISECONDS=800
@@ -38,9 +39,11 @@ The slideshow can be controlled interactively with fbi's key shortcuts.
 
   'q' stops the current slideshow, and then
 
-      * reads in possible new or modified files
+      * reads in possible new or modified files and configuration
       * converts unseen text files and
       * restarts the slideshow with the new contents
+
+  'Ctrl-C' stops the slideshow and the script completely
 
 ===============================================================================
 EOF
@@ -121,7 +124,7 @@ function maintenance() {
 
     echo ""
     echo "----- Maintenance running. Be patient. -------"
-    fbi -d /dev/fb0 --nointeractive --noverbose -a ${MAINTENANCE_MSG_FILE}.jpg </dev/null 2>$SAVE_STDERR_TO &
+    /usr/local/bin/fbi -d /dev/fb0 --nointeractive --noverbose -a ${MAINTENANCE_MSG_FILE}.jpg </dev/null 2>$SAVE_STDERR_TO &
     fbipid=$!
     txtfiles2jpg
     kill $fbipid
@@ -130,7 +133,7 @@ function maintenance() {
 
 
 function list_images() {
-    find . -maxdepth 1 -type f ! \( -name "*.txt" -o -name "*.md" -o -name "$MYNAME" -o -name "stderr.log" \) -print | sort
+    find . -maxdepth 1 -type f ! \( -name ".*" -o -name "*.txt" -o -name "*.md" -o -name "$MYNAME" \) -print | sort
 }
 
 #=============================================================================
@@ -153,12 +156,13 @@ IMAGE_DIR=${PWD}
 MAINTENANCE_DIR=${IMAGE_DIR}/maintenance
 MAINTENANCE_MSG_FILE=${MAINTENANCE_DIR}/maintenance.txt
 
+[ -f .rpifbss.conf ] && . .rpifbss.conf
+
 SAVE_STDERR_TO="/dev/null"
-#SAVE_STDERR_TO="stderr.log"
 
 MYNAME=$(basename $0)
 
-MYVERSION=$(fbi -V | head -1 | awk '{sub(/,/,"",$3); print $3;}')
+MYVERSION=$(/usr/local/bin/fbi -V | head -1 | awk '{sub(/,/,"",$3); print $3;}')
 if [[ "$MYVERSION" < "2.14" ]] ; then
     echo -e "\nError: Program 'fbi' is too old! Please update to version 2.14 or newer!"
     echo -e "       Probably it needs to be compiled from source."
@@ -179,6 +183,11 @@ while true ; do
     IMAGES=$(list_images)
     echo ""
     print_shortcuts
-    fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES  2>$SAVE_STDERR_TO
+    /usr/local/bin/fbi --device /dev/fb0 --noverbose --edit --backup --autozoom --blend $BLEND_MILLISECONDS --timeout $SECONDS_PER_IMAGE  $IMAGES
+
+    # Or with fim instead of fbi:
+    # /usr/local/bin/fim --device /dev/fb0 -o fb --quiet --slideshow=$SECONDS_PER_IMAGE --autozoom $IMAGES
+    # This is working but the maintenance interrupt is visible for a short time because the last image is not kept visible (like it is in fbi!?)  :-(
+    #/usr/local/bin/fim -c "reload; i:fresh=1; while(_fileindex <= _filelistlen-_loop_only_once){sleep $SECONDS_PER_IMAGE; next;} sleep $SECONDS_PER_IMAGE; _loop_only_once=0; quit;" --once --device /dev/fb0 -o fb --quiet --autozoom $IMAGES
 done
 
